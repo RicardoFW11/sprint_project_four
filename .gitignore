@@ -59,3 +59,7 @@ logs/
 
 # Git lock files
 .git/index.lock
+
+# Embeddings
+Embeddings/
+Embeddings_test/
