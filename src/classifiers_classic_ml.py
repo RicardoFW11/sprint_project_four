@@ -1,13 +1,12 @@
-import pandas as pd
-
-# Metrics
-from sklearn.metrics import confusion_matrix, roc_curve, classification_report, accuracy_score, precision_score, recall_score, f1_score, auc
+import warnings
+from itertools import cycle
 
 # Plots:
 import matplotlib.pyplot as plt
-import seaborn as sns
+import pandas as pd
 import plotly.express as px
-from itertools import cycle
+import seaborn as sns
+from sklearn.decomposition import PCA
 
 # Models
 from sklearn.ensemble import RandomForestClassifier
@@ -15,14 +14,27 @@ from sklearn.linear_model import LogisticRegression
 
 ## Embeddings Visualization
 from sklearn.manifold import TSNE
-from sklearn.decomposition import PCA
 
-import warnings
+# Metrics
+from sklearn.metrics import (
+    accuracy_score,
+    auc,
+    classification_report,
+    confusion_matrix,
+    f1_score,
+    precision_score,
+    recall_score,
+    roc_curve,
+)
+
 warnings.filterwarnings("ignore")
 
-def visualize_embeddings(X_train, X_test, y_train, y_test, plot_type='2D', method='PCA'): 
+
+def visualize_embeddings(
+    X_train, X_test, y_train, y_test, plot_type="2D", method="PCA"
+):
     """
-    Visualizes high-dimensional embeddings (e.g., text or image embeddings) using dimensionality reduction techniques (PCA or t-SNE) 
+    Visualizes high-dimensional embeddings (e.g., text or image embeddings) using dimensionality reduction techniques (PCA or t-SNE)
     and plots the results in 2D or 3D using Plotly for interactive visualizations.
 
     Args:
@@ -38,7 +50,7 @@ def visualize_embeddings(X_train, X_test, y_train, y_test, plot_type='2D', metho
 
     Side Effects:
         - Displays an interactive 2D or 3D scatter plot of the reduced embeddings, with points colored by their class labels.
-    
+
     Notes:
         - PCA is a linear dimensionality reduction method, while t-SNE is non-linear and captures more complex relationships.
         - Perplexity is set to 10 for t-SNE. It can be tuned if necessary for better visualization of data clusters.
@@ -55,54 +67,69 @@ def visualize_embeddings(X_train, X_test, y_train, y_test, plot_type='2D', metho
     """
     perplexity = 10
 
-    if plot_type == '3D':
-        if method == 'PCA':
+    if plot_type == "3D":
+        if method == "PCA":
             # TODO: Create an instance of PCA for 3D visualization and fit it on the training data
             red = None
             # TODO: Use the trained model to transform the test data
             reduced_embeddings = None
-        elif method == 't-SNE':
+        elif method == "t-SNE":
             # TODO: Implement t-SNE for 3D visualization
             red = None
             # TODO: Use the model to train and transform the test data
             reduced_embeddings = None
         else:
-            raise ValueError("Invalid method. Please choose either 'PCA' or 't-SNE'.")
-        
-            
-        df_reduced = pd.DataFrame(reduced_embeddings, columns=['col1', 'col2', 'col3'])
-        df_reduced['Class'] = y_test
+            raise ValueError(
+                "Invalid method. Please choose either 'PCA' or 't-SNE'."
+            )
+
+        df_reduced = pd.DataFrame(
+            reduced_embeddings, columns=["col1", "col2", "col3"]
+        )
+        df_reduced["Class"] = y_test
 
         # 3D scatter plot
-        fig = px.scatter_3d(df_reduced, x='col1', y='col2', z='col3', color='Class', title='3D')
-    
+        fig = px.scatter_3d(
+            df_reduced,
+            x="col1",
+            y="col2",
+            z="col3",
+            color="Class",
+            title="3D",
+        )
+
     else:
-        if method == 'PCA':
+        if method == "PCA":
             # TODO: Create an instance of PCA for 2D visualization and fit it on the training data
             red = None
             # TODO: Use the trained model to transform the test data
             reduced_embeddings = None
-        elif method == 't-SNE':
+        elif method == "t-SNE":
             # TODO: Implement t-SNE for 2D visualization
             red = None
             # TODO: Use the model to train and transform the test data
             reduced_embeddings = None
         else:
-            raise ValueError("Invalid method. Please choose either 'PCA' or 't-SNE'.")
-        
-        df_reduced = pd.DataFrame(reduced_embeddings, columns=['col1', 'col2'])
-        df_reduced['Class'] = y_test
+            raise ValueError(
+                "Invalid method. Please choose either 'PCA' or 't-SNE'."
+            )
+
+        df_reduced = pd.DataFrame(
+            reduced_embeddings, columns=["col1", "col2"]
+        )
+        df_reduced["Class"] = y_test
 
         # 2D scatter plot
-        fig = px.scatter(df_reduced, x='col1', y='col2', color='Class', title='2D')
-    
+        fig = px.scatter(
+            df_reduced, x="col1", y="col2", color="Class", title="2D"
+        )
+
     fig.update_layout(
-        title=f"Embeddings - {method} {plot_type} Visualization",
-        scene=dict()
+        title=f"Embeddings - {method} {plot_type} Visualization", scene=dict()
     )
-    
+
     fig.show()
-    
+
     return red
 
 
@@ -110,8 +137,8 @@ def test_model(X_test, y_test, model):
     """
     Evaluates a trained model on a test set by computing key performance metrics and visualizing the results.
 
-    The function generates a confusion matrix, plots ROC curves (for binary or multi-class classification), 
-    and prints the classification report. It also computes overall accuracy, weighted precision, weighted recall, 
+    The function generates a confusion matrix, plots ROC curves (for binary or multi-class classification),
+    and prints the classification report. It also computes overall accuracy, weighted precision, weighted recall,
     and weighted F1-score for the test data.
 
     Args:
@@ -136,7 +163,7 @@ def test_model(X_test, y_test, model):
 
     Notes:
         - If `y_test` is multi-dimensional (e.g., one-hot encoded), it will be squeezed to 1D.
-        - For binary classification, a single ROC curve is plotted. For multi-class classification, 
+        - For binary classification, a single ROC curve is plotted. For multi-class classification,
           an ROC curve is plotted for each class with a unique color.
         - Weighted precision, recall, and F1-score are computed to handle class imbalance in multi-class classification.
 
@@ -145,14 +172,14 @@ def test_model(X_test, y_test, model):
     y_pred = model.predict(X_test)
     y_pred_proba = model.predict_proba(X_test)
     y_test = y_test.squeeze() if y_test.ndim > 1 else y_test
-    
+
     # Confusion matrix
     cm = confusion_matrix(y_test, y_pred)
     plt.figure(figsize=(10, 5))
-    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
-    plt.xlabel('Predicted')
-    plt.ylabel('True')
-    plt.title(f'Confusion Matrix')
+    sns.heatmap(cm, annot=True, fmt="d", cmap="Blues")
+    plt.xlabel("Predicted")
+    plt.ylabel("True")
+    plt.title(f"Confusion Matrix")
     plt.show()
 
     # ROC curve
@@ -161,16 +188,43 @@ def test_model(X_test, y_test, model):
     # Binary classification
     if y_pred_proba.shape[1] == 2:
         fpr, tpr, _ = roc_curve(y_test, y_pred_proba[:, 1])
-        ax.plot(fpr, tpr, color='aqua', lw=2, label=f'ROC curve (area = {auc(fpr, tpr):.2f})')
+        ax.plot(
+            fpr,
+            tpr,
+            color="aqua",
+            lw=2,
+            label=f"ROC curve (area = {auc(fpr, tpr):.2f})",
+        )
         ax.plot([0, 1], [0, 1], "k--", label="Chance level (AUC = 0.5)")
     # Multiclass classification
-    else: 
+    else:
         y_onehot_test = pd.get_dummies(y_test).values
-        colors = cycle(["aqua", "darkorange", "cornflowerblue", "red", "green", "yellow", "purple", "pink", "brown", "black"])
+        colors = cycle(
+            [
+                "aqua",
+                "darkorange",
+                "cornflowerblue",
+                "red",
+                "green",
+                "yellow",
+                "purple",
+                "pink",
+                "brown",
+                "black",
+            ]
+        )
 
         for class_id, color in zip(range(y_onehot_test.shape[1]), colors):
-            fpr, tpr, _ = roc_curve(y_onehot_test[:, class_id], y_pred_proba[:, class_id])
-            ax.plot(fpr, tpr, color=color, lw=2, label=f'ROC curve for class {class_id} (area = {auc(fpr, tpr):.2f})')
+            fpr, tpr, _ = roc_curve(
+                y_onehot_test[:, class_id], y_pred_proba[:, class_id]
+            )
+            ax.plot(
+                fpr,
+                tpr,
+                color=color,
+                lw=2,
+                label=f"ROC curve for class {class_id} (area = {auc(fpr, tpr):.2f})",
+            )
 
     ax.plot([0, 1], [0, 1], "k--", label="Chance level (AUC = 0.5)")
     ax.set_axisbelow(True)
@@ -179,23 +233,24 @@ def test_model(X_test, y_test, model):
     ax.set_title("ROC Curve")
     ax.legend(loc="lower right")
     plt.show()
-        
+
     cr = classification_report(y_test, y_pred)
     print(cr)
 
     accuracy = accuracy_score(y_test, y_pred)
-    precision = precision_score(y_test, y_pred, average='weighted')
-    recall = recall_score(y_test, y_pred, average='weighted')
-    f1 = f1_score(y_test, y_pred, average='weighted')
+    precision = precision_score(y_test, y_pred, average="weighted")
+    recall = recall_score(y_test, y_pred, average="weighted")
+    f1 = f1_score(y_test, y_pred, average="weighted")
 
     return accuracy, precision, recall, f1
 
 
-
-def train_and_evaluate_model(X_train, X_test, y_train, y_test, models=None, test=True):
+def train_and_evaluate_model(
+    X_train, X_test, y_train, y_test, models=None, test=True
+):
     """
     Trains and evaluates multiple machine learning models on a given dataset, then visualizes the data embeddings
-    using PCA before training. This function trains each model on the training data, evaluates them on the test data, 
+    using PCA before training. This function trains each model on the training data, evaluates them on the test data,
     and computes performance metrics (accuracy, precision, recall, and F1-score).
 
     Args:
@@ -204,7 +259,7 @@ def train_and_evaluate_model(X_train, X_test, y_train, y_test, models=None, test
         y_train (np.ndarray): True labels for the training data.
         y_test (np.ndarray): True labels for the test data.
         models (list of tuples, optional): A list of tuples, where each tuple contains the model name as a string and
-                                           the corresponding scikit-learn model instance. 
+                                           the corresponding scikit-learn model instance.
                                            If None, default models include Random Forest, Decision Tree, and Logistic Regression.
 
     Returns:
@@ -224,23 +279,23 @@ def train_and_evaluate_model(X_train, X_test, y_train, y_test, models=None, test
         - The function uses PCA for the embedding visualization. You can modify the `visualize_embeddings` function call for other visualization methods or dimensionality reduction techniques.
         - Default models include Random Forest, Decision Tree, and Logistic Regression.
     """
-    
-    visualize_embeddings(X_train, X_test, y_train, y_test, plot_type='2D', method='PCA')
-    
-    if not(models):
+
+    visualize_embeddings(
+        X_train, X_test, y_train, y_test, plot_type="2D", method="PCA"
+    )
+
+    if not (models):
         # TODO: Implement the ML models
         # The models should be a list of tuples, where each tuple contains the model name and the model instance
         # Example: models = [ ('Model 1', Model1()), ('Model2', Model2()), ... ('ModelN', ModelN()) ]
         models = []
 
     for name, model in models:
-        
-        print('#'*20, f' {name} ', '#'*20)
+        print("#" * 20, f" {name} ", "#" * 20)
         # TODO: Train the model on the training
-        
-        
+
         # TODO: Evaluate the model on the test set using the test_model function
         if test:
             accuracy, precision, recall, f1 = None, None, None, None
-        
+
     return models
