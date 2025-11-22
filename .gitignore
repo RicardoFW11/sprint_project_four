@@ -60,6 +60,17 @@ logs/
 # Git lock files
 .git/index.lock
 
-# Embeddings
-Embeddings/
-Embeddings_test/
+# files in the Embeddings directory
+Embeddings/Embeddings_convnexttv2_tiny.csv
+Embeddings/embeddings_minilm.csv
+Embeddings/text_embeddings_minilm.csv
+
+
+# files in data
+data/images/
+data/Raw/
+data/processed_products.csv
+data/processed_products_with_images.csv
+data/categories.json
+data/processed_products_with_images.csv
+data/processed_products_with_images.csv
