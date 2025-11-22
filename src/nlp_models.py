@@ -253,7 +253,8 @@ class HuggingFaceEmbeddings:
         )  # Shape: (batch_size, hidden_size)
 
         # Convertir a numpy
-        embeddings = embeddings.cpu().numpy()
+        embeddings = embeddings.cpu().numpy().squeeze(0)
+
         return embeddings
 
     def get_embedding_df(self, column, directory, file):
