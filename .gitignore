@@ -61,9 +61,7 @@ logs/
 .git/index.lock
 
 # files in the Embeddings directory
-Embeddings/Embeddings_convnexttv2_tiny.csv
-Embeddings/embeddings_minilm.csv
-Embeddings/text_embeddings_minilm.csv
+Embeddings/
 
 
 # files in data
