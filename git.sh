@@ -5,12 +5,12 @@ echo "Configuring Git account for RicardoFW11..."
 git config user.name "RicardoFW11"
 git config user.email "ricardo.fajardo@cgcompass.com"
 
-# Verificar que el remote esté configurado correctamente (HTTPS en lugar de SSH)
+# Verificar que el remote esté configurado correctamente con SSH
 current_remote=$(git remote get-url origin)
-if [[ $current_remote == git@github.com:* ]]; then
-    echo "Converting SSH remote to HTTPS..."
-    repo_path=$(echo $current_remote | sed 's/git@github.com://' | sed 's/.git$//')
-    git remote set-url origin "https://github.com/$repo_path.git"
+if [[ $current_remote == https://github.com/* ]]; then
+    echo "Converting HTTPS remote to SSH..."
+    repo_path=$(echo $current_remote | sed 's#https://github.com/##' | sed 's/.git$//')
+    git remote set-url origin "git@github-ricardo:$repo_path.git"
 fi
 
 echo "Git configuration updated successfully!"
